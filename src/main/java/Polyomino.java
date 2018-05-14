@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -12,7 +9,7 @@ import java.util.stream.Stream;
 public class Polyomino {
 
     private List<Position> squares;
-    private Comparator<Position> comparator = Comparator.comparing(Position::getX).thenComparing(Position::getY);
+    private static final Comparator<Position> comparator = Comparator.comparing(Position::getX).thenComparing(Position::getY);
 
     public Polyomino(List<Position> squares) {
         this.squares = squares.stream().sorted(comparator).collect(Collectors.toList());
@@ -128,10 +125,27 @@ public class Polyomino {
         return squares;
     }
 
+    public boolean hasSubset(Polyomino polyomino) {
+        return this.squares.containsAll(polyomino.getSquares());
+    }
+
     @Override
     public String toString() {
         return "Polyomino{" +
                 "squares=" + squares +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Polyomino polyomino = (Polyomino) o;
+        return Objects.equals(squares, polyomino.squares);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(squares);
     }
 }

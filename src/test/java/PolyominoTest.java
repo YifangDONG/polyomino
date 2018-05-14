@@ -43,7 +43,7 @@ public class PolyominoTest {
     }
 
     @Test
-    public void reflact() throws Exception {
+    public void reflect() throws Exception {
         System.out.println(threePolyomino1);
         System.out.println(threePolyomino1.reflect());
         assertTrue(threePolyomino1.equalTo(threePolyomino1.reflect()));
