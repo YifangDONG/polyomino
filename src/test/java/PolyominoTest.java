@@ -58,14 +58,4 @@ public class PolyominoTest {
         System.out.println("possible positions: " + polyomino.addOneSquare(position).getPossiblePositions());
     }
 
-    @Test
-    public void isTranslatedTo() throws Exception {
-        Polyomino rsc = threePolyomino1;
-        List<Position> dstPositions = threePolyomino1.getSquares().stream().map(position -> new Position(position.getX() + 1, position.getY() - 1)).collect(Collectors.toList());
-        Polyomino dst = new Polyomino(dstPositions);
-        System.out.println(rsc);
-        System.out.println(dst);
-        assertTrue(rsc.isTranslatedTo(dst));
-    }
-
 }

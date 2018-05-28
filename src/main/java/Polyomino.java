@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,6 +14,8 @@ public class Polyomino {
 
     public Polyomino(List<Position> squares) {
         this.squares = squares.stream().sorted(comparator).collect(Collectors.toList());
+        Position dir = this.squares.get(0);
+        this.squares.replaceAll(position -> translate(position,dir));
     }
 
     public static Polyomino initPolyomino() {
@@ -25,23 +28,22 @@ public class Polyomino {
         }
         List<Position> squares = new ArrayList<>(this.squares);
         squares.add(position);
-        squares.sort(comparator);
         return new Polyomino(squares);
     }
 
     public boolean equalTo(Polyomino polyomino) {
-        return this.isTranslatedTo(polyomino) ||
-                this.isTranslatedTo(polyomino.rotate(90)) ||
-                this.isTranslatedTo(polyomino.rotate(180)) ||
-                this.isTranslatedTo(polyomino.rotate(270)) ||
-                this.isTranslatedTo(polyomino.reflect()) ||
-                this.isTranslatedTo(polyomino.reflect().rotate(90)) ||
-                this.isTranslatedTo(polyomino.reflect().rotate(180)) ||
-                this.isTranslatedTo(polyomino.reflect().rotate(270));
+        return this.equals(polyomino) ||
+                this.equals(polyomino.rotate(90)) ||
+                this.equals(polyomino.rotate(180)) ||
+                this.equals(polyomino.rotate(270)) ||
+                this.equals(polyomino.reflect()) ||
+                this.equals(polyomino.reflect().rotate(90)) ||
+                this.equals(polyomino.reflect().rotate(180)) ||
+                this.equals(polyomino.reflect().rotate(270));
     }
 
     public Polyomino rotate(int degree) {
-        Function<Position, Position> rotate;
+        UnaryOperator<Position> rotate;
         switch (degree) {
             case 90: {
                 rotate = e -> rotate(e, new Position(0, 1));
@@ -59,7 +61,7 @@ public class Polyomino {
                 throw new RuntimeException(String.format("Can not rotate with degree: %d, accepted degree are 90, 180, 270", degree));
             }
         }
-        return new Polyomino(this.getSquares().stream().map(rotate).sorted(comparator).collect(Collectors.toList()));
+        return new Polyomino(this.getSquares().stream().map(rotate).collect(Collectors.toList()));
     }
 
     private static Position rotate(Position position, Position degree) {
@@ -68,8 +70,12 @@ public class Polyomino {
         return new Position(x, y);
     }
 
+    private static Position translate(Position position, Position dir) {
+        return new Position(position.getX()-dir.getX(),position.getY()-dir.getY());
+    }
+
     public Polyomino reflect() {
-        return new Polyomino(this.getSquares().stream().map(Polyomino::reflect).sorted(comparator).collect(Collectors.toList()));
+        return new Polyomino(this.getSquares().stream().map(Polyomino::reflect).collect(Collectors.toList()));
     }
 
     private static Position reflect(Position position) {
@@ -79,7 +85,7 @@ public class Polyomino {
     public List<Position> getPossiblePositions() {
         return squares.stream()
                 .flatMap(Polyomino::getTouchedPositions)
-                .filter(e -> !isContained(e))
+                .filter(e -> !squares.contains(e))
                 .distinct()
                 .collect(Collectors.toList());
     }
@@ -99,34 +105,12 @@ public class Polyomino {
                 .anyMatch(e -> Math.abs(e.getY() - position.getY()) + Math.abs(e.getX() - position.getX()) == 1);
     }
 
-    private boolean isContained(Position position) {
-        return squares.stream()
-                .anyMatch(e -> e.getX() == position.getX() && e.getY() == position.getY());
-    }
-
-    public boolean isTranslatedTo(final Polyomino polyomino) {
-        List<Position> targetSquares = polyomino.getSquares();
-        int x = targetSquares.get(0).getX() - squares.get(0).getX();
-        int y = targetSquares.get(0).getY() - squares.get(0).getY();
-        Position dir = new Position(x, y);
-        for (int i = 0; i < squares.size(); i++) {
-            if (!isTranslatedTo(squares.get(i), targetSquares.get(i), dir)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isTranslatedTo(Position rsc, Position dst, Position dir) {
-        return rsc.getX() + dir.getX() == dst.getX() && rsc.getY() + dir.getY() == dst.getY();
-    }
-
     public List<Position> getSquares() {
         return squares;
     }
 
     public boolean hasSubset(Polyomino polyomino) {
-        return this.squares.containsAll(polyomino.getSquares());
+        return this.squares.contains(polyomino.getSquares());
     }
 
     @Override
