@@ -1,3 +1,5 @@
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -7,7 +9,7 @@ import java.util.stream.Stream;
 /**
  * Created by yifang on 5/8/2018.
  */
-public class Polyomino {
+public class Polyomino implements Comparable {
 
     private List<Position> squares;
     private static final Comparator<Position> comparator = Comparator.comparing(Position::getX).thenComparing(Position::getY);
@@ -15,7 +17,7 @@ public class Polyomino {
     public Polyomino(List<Position> squares) {
         this.squares = squares.stream().sorted(comparator).collect(Collectors.toList());
         Position dir = this.squares.get(0);
-        this.squares.replaceAll(position -> translate(position,dir));
+        this.squares.replaceAll(position -> translate(position, dir));
     }
 
     public static Polyomino initPolyomino() {
@@ -29,6 +31,19 @@ public class Polyomino {
         List<Position> squares = new ArrayList<>(this.squares);
         squares.add(position);
         return new Polyomino(squares);
+    }
+
+    public static List<Polyomino> getSymmetricPolyominos(Polyomino polyomino) {
+        List<Polyomino> polyominos = new ArrayList<>();
+        polyominos.add(polyomino);
+        polyominos.add(polyomino.rotate(90));
+        polyominos.add(polyomino.rotate(180));
+        polyominos.add(polyomino.rotate(270));
+        polyominos.add(polyomino.reflect());
+        polyominos.add(polyomino.reflect().rotate(90));
+        polyominos.add(polyomino.reflect().rotate(180));
+        polyominos.add(polyomino.reflect().rotate(270));
+        return polyominos;
     }
 
     public boolean equalTo(Polyomino polyomino) {
@@ -71,7 +86,7 @@ public class Polyomino {
     }
 
     private static Position translate(Position position, Position dir) {
-        return new Position(position.getX()-dir.getX(),position.getY()-dir.getY());
+        return new Position(position.getX() - dir.getX(), position.getY() - dir.getY());
     }
 
     public Polyomino reflect() {
@@ -131,5 +146,19 @@ public class Polyomino {
     @Override
     public int hashCode() {
         return Objects.hash(squares);
+    }
+
+    @Override
+    public int compareTo(@NotNull Object o) {
+        Polyomino polyomino = (Polyomino) o;
+        if (squares.size() != polyomino.getSquares().size()) {
+            return squares.size() > polyomino.getSquares().size() ? 1 : -1;
+        } else {
+            int i = 0;
+            while (squares.get(i).compareTo(polyomino.getSquares().get(i)) == 0 && i < squares.size()-1) {
+                i++;
+            }
+            return squares.get(i).compareTo(polyomino.getSquares().get(i));
+        }
     }
 }

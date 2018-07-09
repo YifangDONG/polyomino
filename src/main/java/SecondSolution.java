@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparing;
 
 /**
  * Created by yifang on 5/10/2018.
@@ -13,56 +16,38 @@ public class SecondSolution implements Solution {
         this.level = level;
     }
 
+    private List<Polyomino> constructNextLevel(Polyomino polyomino) {
+        return polyomino.getPossiblePositions().stream()
+                .parallel()
+                .map(p ->
+                {
+                    Polyomino poly = new Polyomino(polyomino.addOneSquare(p).getSquares());
+                    List<Polyomino> symmetricPolyominos = Polyomino.getSymmetricPolyominos(poly);
+                    return symmetricPolyominos.stream().min(Polyomino::compareTo).get();
+                })
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    private List<Polyomino> calculate(int n) {
+        if (n < 0) {
+            throw new IllegalArgumentException("calculate cannot be negative");
+        }
+        if (n == 0) {
+            return new ArrayList<>();
+        }
+        if (n == 1) {
+            return Arrays.asList(Polyomino.initPolyomino());
+        }
+        return calculate(n - 1).stream()
+                .parallel()
+                .flatMap(polyomino -> constructNextLevel(polyomino).stream())
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
     @Override
     public int calculate() {
-        if (level == 1) {
-            return 1;
-        } else {
-            List<Polyomino> fatherPalominos = Arrays.asList(Polyomino.initPolyomino());
-            for (int i = 1; i < level; i++) {
-                List<Polyomino> newPolyominos = new ArrayList<>();
-                for (int j = 0; j < fatherPalominos.size(); j++) {
-                    List<Position> positions = fatherPalominos.get(j).getPossiblePositions();
-                    List<Polyomino> subPolyominos = new ArrayList<>();
-                    for (Position p : positions) {
-                        Polyomino newPolyomino = fatherPalominos.get(j).addOneSquare(p);
-                        boolean isNew = true;
-                        boolean isNeed = true;
-                        for(int k = 0; k < j;k++) {
-                            if(newPolyomino.hasSubset(fatherPalominos.get(k))){
-                                isNeed = false;
-                            }
-                        }
-                        if(!isNeed) {
-                            break;
-                        }
-                        for (Polyomino existPolyomino : subPolyominos) {
-                            if (newPolyomino.equalTo(existPolyomino)) {
-                                isNew = false;
-                                break;
-                            }
-                        }
-                        if (isNew) {
-                            subPolyominos.add(newPolyomino);
-                        }
-                    }
-                    for (Polyomino newPolyomino : subPolyominos) {
-                        boolean isNew = true;
-                        for (Polyomino existPolyomino : newPolyominos) {
-                            if (newPolyomino.equalTo(existPolyomino)) {
-                                isNew = false;
-                                break;
-                            }
-
-                        }
-                        if (isNew) {
-                            newPolyominos.add(newPolyomino);
-                        }
-                    }
-                }
-                fatherPalominos = newPolyominos;
-            }
-            return fatherPalominos.size();
-        }
+        return calculate(level).size();
     }
 }

@@ -81,13 +81,13 @@ public class SolutionTest {
 
     @Test
     public void level11() throws Exception {
-        Solution solution = new BasicSolution(11);
+        Solution solution = new SecondSolution(11);
         assertEquals(17073, calculateWithElapsedTime.apply(solution).intValue());
     }
 
     @Test
     public void level12() throws Exception {
-        Solution solution = new BasicSolution(12);
+        Solution solution = new SecondSolution(12);
         assertEquals(63600, calculateWithElapsedTime.apply(solution).intValue());
     }
 }
