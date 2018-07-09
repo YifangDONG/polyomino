@@ -3,5 +3,5 @@
  */
 public interface Solution {
 
-    int calculate();
+    int calculate(int level);
 }

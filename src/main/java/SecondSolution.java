@@ -10,12 +10,6 @@ import static java.util.Comparator.comparing;
  */
 public class SecondSolution implements Solution {
 
-    private int level;
-
-    public SecondSolution(int level) {
-        this.level = level;
-    }
-
     private List<Polyomino> constructNextLevel(Polyomino polyomino) {
         return polyomino.getPossiblePositions().stream()
                 .parallel()
@@ -29,7 +23,7 @@ public class SecondSolution implements Solution {
                 .collect(Collectors.toList());
     }
 
-    private List<Polyomino> calculate(int n) {
+    private List<Polyomino> create(int n) {
         if (n < 0) {
             throw new IllegalArgumentException("calculate cannot be negative");
         }
@@ -39,7 +33,7 @@ public class SecondSolution implements Solution {
         if (n == 1) {
             return Arrays.asList(Polyomino.initPolyomino());
         }
-        return calculate(n - 1).stream()
+        return create(n - 1).stream()
                 .parallel()
                 .flatMap(polyomino -> constructNextLevel(polyomino).stream())
                 .distinct()
@@ -47,7 +41,7 @@ public class SecondSolution implements Solution {
     }
 
     @Override
-    public int calculate() {
-        return calculate(level).size();
+    public int calculate(int level) {
+        return create(level).size();
     }
 }

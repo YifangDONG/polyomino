@@ -1,20 +1,14 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Created by yifang on 5/8/2018.
  */
 public class BasicSolution implements Solution{
-    private int level;
-
-    public BasicSolution(int level) {
-        this.level = level;
-    }
 
     @Override
-    public int calculate() {
+    public int calculate(int level) {
         if (level == 1) {
             return 1;
         } else {
